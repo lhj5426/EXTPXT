@@ -269,10 +269,16 @@
         #resourceList.grid-view .res-item {
             display: block;
             padding: 0;
-            overflow: hidden;
+            overflow: visible;
             line-height: 0;
             width: 128px;
             height: 128px;
+            position: relative;
+        }
+        
+        #resourceList.grid-view .img-wrapper {
+            overflow: hidden;
+            border-radius: 3px;
         }
 
         #resourceList.grid-view .img-wrapper {
@@ -280,6 +286,7 @@
             line-height: 0;
             width: 100%;
             height: 100%;
+            position: relative;
         }
 
         #resourceList.grid-view .res-thumb {
@@ -297,7 +304,25 @@
         }
 
         #resourceList.grid-view .res-name {
-            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 4px 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #resourceList.grid-view .res-item:hover .res-name {
+            opacity: 1;
         }
 
         #resourceList.grid-view .res-size {
@@ -358,6 +383,12 @@
                 <label><input type="checkbox" checked value="webp"> WEBP</label>
                 <label><input type="checkbox" checked value="avif"> AVIF</label>
                 <label><input type="checkbox" value="gif"> GIF</label>
+            </div>
+
+            <div class="checkbox-group" style="margin-left: 10px;">
+                <label>
+                    <input type="checkbox" id="filterDuplicateNames" checked> 过滤重复文件名
+                </label>
             </div>
 
             <button id="showFailedBtn" style="display:none; background: #d9534f; border-color: #d9534f;">⚠️ 加载失败 (<span id="failedCount">0</span>)</button>

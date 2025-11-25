@@ -10,7 +10,7 @@ const useUrlBtn = document.getElementById('useUrlBtn');
 const minWInput = document.getElementById('minW');
 const minHInput = document.getElementById('minH');
 const countDisplay = document.getElementById('countDisplay');
-const typeCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]:not(#autoRefreshCheck)');
+const typeCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]:not(#autoRefreshCheck):not(#filterDuplicateNames)');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
@@ -24,6 +24,7 @@ const showFailedBtn = document.getElementById('showFailedBtn');
 const failedCount = document.getElementById('failedCount');
 const refreshCountdown = document.getElementById('refreshCountdown');
 const batchCountdown = document.getElementById('batchCountdown');
+const filterDuplicateNames = document.getElementById('filterDuplicateNames');
 
 // 数据状态
 let allItems = []; // 存放所有扫描到的资源对象 {url, element, width, height, type}
@@ -69,18 +70,24 @@ function scanResources() {
             return;
         }
 
-        // 去重：根据文件名去重
-        const uniqueImages = [];
-        const seenNames = new Set();
+        // 去重：根据文件名去重（可选）
+        let uniqueImages = [];
         
-        images.forEach(img => {
-            // 提取文件名（去掉路径和参数）
-            const fileName = img.url.split('/').pop().split('?')[0];
-            if (!seenNames.has(fileName)) {
-                seenNames.add(fileName);
-                uniqueImages.push(img);
-            }
-        });
+        if (filterDuplicateNames.checked) {
+            // 过滤重复文件名
+            const seenNames = new Set();
+            images.forEach(img => {
+                // 提取文件名（去掉路径和参数）
+                const fileName = img.url.split('/').pop().split('?')[0];
+                if (!seenNames.has(fileName)) {
+                    seenNames.add(fileName);
+                    uniqueImages.push(img);
+                }
+            });
+        } else {
+            // 不过滤，显示所有图片
+            uniqueImages = images;
+        }
 
         // 按文件名自然排序
         uniqueImages.sort((a, b) => {
@@ -409,6 +416,22 @@ async function startDownload(items, folder) {
                     let filename = item.url.split('/').pop().split('?')[0];
                     try { filename = decodeURIComponent(filename); } catch (e) { }
 
+                    // 生成URL哈希值（取前8位）
+                    const hash = item.url.split('').reduce((acc, char) => {
+                        return ((acc << 5) - acc) + char.charCodeAt(0);
+                    }, 0);
+                    const hashStr = Math.abs(hash).toString(36).substring(0, 8);
+
+                    // 在文件名中插入哈希值
+                    const lastDotIndex = filename.lastIndexOf('.');
+                    if (lastDotIndex > 0) {
+                        const name = filename.substring(0, lastDotIndex);
+                        const ext = filename.substring(lastDotIndex);
+                        filename = `${name}_${hashStr}${ext}`;
+                    } else {
+                        filename = `${filename}_${hashStr}`;
+                    }
+
                     // 组合路径
                     const safeFolder = folder ? folder.replace(/[\\/:*?"<>|]/g, '_') : '';
                     const filepath = safeFolder ? `${safeFolder}/${filename}` : filename;
@@ -518,6 +541,11 @@ viewListBtn.onclick = () => {
 };
 
 refreshBtn.onclick = scanResources;
+
+// 过滤重复文件名选项改变时重新扫描
+filterDuplicateNames.onchange = () => {
+    scanResources();
+};
 
 // 自动刷新功能
 let autoRefreshTimer = null;

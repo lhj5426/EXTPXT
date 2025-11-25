@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "图片嗅探",
+    "version": "2.0",
+    "description": "批量下载网页图片，支持过滤、排序、自动命名等功能。",
+    "permissions": [
+        "downloads",
+        "storage"
+    ],
+    "icons": {
+        "16": "Plugin16.png",
+        "48": "Plugin96.png",
+        "128": "Plugin96.png"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "Plugin16.png",
+            "48": "Plugin96.png",
+            "128": "Plugin96.png"
+        }
+    },
+    "devtools_page": "devtools.html",
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+}

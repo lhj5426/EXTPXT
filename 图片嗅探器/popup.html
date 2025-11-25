@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 400px;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            box-sizing: border-box;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 15px 0;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 25px;
+            opacity: 0.95;
+        }
+
+        .steps {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: rgba(255, 255, 255, 0.3);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin: 0 2px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            opacity: 0.7;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="icon">🖼️</div>
+    <h1>图片保存器</h1>
+    <div class="message">
+        完整功能请在开发者工具中使用
+    </div>
+    
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-text">按 <span class="key">F12</span> 打开开发者工具</div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-text">在顶部标签栏找到 <strong>图片嗅探</strong></div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-text">点击进入面板，开始批量下载图片</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        支持过滤、排序、批量下载等功能
+    </div>
+</body>
+
+</html>

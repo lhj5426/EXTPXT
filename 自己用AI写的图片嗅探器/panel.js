@@ -11,7 +11,7 @@ const filterMinWInput = document.getElementById('filterMinW');
 const filterMaxWInput = document.getElementById('filterMaxW');
 const filterMinHInput = document.getElementById('filterMinH');
 const filterMaxHInput = document.getElementById('filterMaxH');
-const typeCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]:not(#autoRefreshCheck):not(#filterDuplicateNames)');
+const typeCheckboxes = document.querySelectorAll('#formatCheckboxes input[type="checkbox"]');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
@@ -197,20 +197,7 @@ function applyFilters() {
     let visibleCount = 0;
 
     allItems.forEach(item => {
-        // 特殊处理：如果没加载出来尺寸，暂时显示，等加载完再判断
-        if (item.width === 0) {
-            item.element.classList.remove('hidden');
-            return;
-        }
-
-        // 尺寸检查：如果宽高都在过滤范围内，则隐藏（过滤掉小图）
-        const widthInFilterRange = item.width >= filterMinW && item.width <= filterMaxW;
-        const heightInFilterRange = item.height >= filterMinH && item.height <= filterMaxH;
-        // 只有宽和高都在过滤范围内才过滤掉
-        const shouldFilter = filterMaxW > 0 && filterMaxH > 0 && widthInFilterRange && heightInFilterRange;
-        const sizeOk = !shouldFilter;
-
-        // 类型检查 - 严格匹配
+        // 类型检查 - 严格匹配（无论尺寸是否加载完都要检查类型）
         const itemExt = item.ext.toLowerCase();
         let typeOk = false;
         
@@ -224,7 +211,30 @@ function applyFilters() {
             }
         }
 
-        if (sizeOk && typeOk) {
+        // 如果类型不匹配，直接隐藏
+        if (!typeOk) {
+            item.element.classList.add('hidden');
+            if (selectedUrls.has(item.url)) {
+                selectedUrls.delete(item.url);
+                item.element.classList.remove('selected');
+            }
+            return;
+        }
+
+        // 如果尺寸还没加载出来，暂时显示（类型已经匹配了）
+        if (item.width === 0) {
+            item.element.classList.remove('hidden');
+            return;
+        }
+
+        // 尺寸检查：如果宽高都在过滤范围内，则隐藏（过滤掉小图）
+        const widthInFilterRange = item.width >= filterMinW && item.width <= filterMaxW;
+        const heightInFilterRange = item.height >= filterMinH && item.height <= filterMaxH;
+        // 只有宽和高都在过滤范围内才过滤掉
+        const shouldFilter = filterMaxW > 0 && filterMaxH > 0 && widthInFilterRange && heightInFilterRange;
+        const sizeOk = !shouldFilter;
+
+        if (sizeOk) {
             item.element.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -259,9 +269,9 @@ function updateStats() {
     
     // 统计各格式数量
     const stats = { total: allItems.length, visible: visibleCount, filtered: allItems.length - visibleCount };
-    const formatStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, other: 0 };
-    const selectedStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, other: 0 };
-    const filteredStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, other: 0 };
+    const formatStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, svg: 0, other: 0 };
+    const selectedStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, svg: 0, other: 0 };
+    const filteredStats = { jpg: 0, png: 0, gif: 0, webp: 0, avif: 0, svg: 0, other: 0 };
     
     allItems.forEach(item => {
         const ext = item.ext.toLowerCase();
@@ -274,6 +284,7 @@ function updateStats() {
         else if (ext === 'gif') format = 'gif';
         else if (ext === 'webp') format = 'webp';
         else if (ext === 'avif') format = 'avif';
+        else if (ext === 'svg') format = 'svg';
         
         formatStats[format]++;
         if (isHidden) filteredStats[format]++;
@@ -291,6 +302,7 @@ function updateStats() {
     if (formatStats.gif > 0) loadedParts.push(`<span style="color:#d9534f; font-weight:bold;">GIF:${formatStats.gif}</span>`);
     if (formatStats.webp > 0) loadedParts.push(`<span style="color:#5cb85c; font-weight:bold;">WEBP:${formatStats.webp}</span>`);
     if (formatStats.avif > 0) loadedParts.push(`<span style="color:#9b59b6; font-weight:bold;">AVIF:${formatStats.avif}</span>`);
+    if (formatStats.svg > 0) loadedParts.push(`<span style="color:#e67e22; font-weight:bold;">SVG:${formatStats.svg}</span>`);
     html += `📊 总共: <b style="font-size:15px;">${stats.total}</b>`;
     if (loadedParts.length > 0) html += ` &nbsp;(${loadedParts.join('&nbsp;&nbsp;')})`;
     
@@ -303,6 +315,7 @@ function updateStats() {
         if (filteredStats.gif > 0) filterParts.push(`<span style="color:#d9534f;">GIF:${filteredStats.gif}</span>`);
         if (filteredStats.webp > 0) filterParts.push(`<span style="color:#5cb85c;">WEBP:${filteredStats.webp}</span>`);
         if (filteredStats.avif > 0) filterParts.push(`<span style="color:#9b59b6;">AVIF:${filteredStats.avif}</span>`);
+        if (filteredStats.svg > 0) filterParts.push(`<span style="color:#e67e22;">SVG:${filteredStats.svg}</span>`);
         html += `${sep}🚫 过滤: <b style="color:#d9534f; font-size:15px;">${stats.filtered}</b>`;
         if (filterParts.length > 0) html += ` &nbsp;(${filterParts.join('&nbsp;&nbsp;')})`;
     }
@@ -314,6 +327,7 @@ function updateStats() {
         if (selectedStats.gif > 0) selParts.push(`<span style="color:#d9534f;">GIF:${selectedStats.gif}</span>`);
         if (selectedStats.webp > 0) selParts.push(`<span style="color:#5cb85c;">WEBP:${selectedStats.webp}</span>`);
         if (selectedStats.avif > 0) selParts.push(`<span style="color:#9b59b6;">AVIF:${selectedStats.avif}</span>`);
+        if (selectedStats.svg > 0) selParts.push(`<span style="color:#e67e22;">SVG:${selectedStats.svg}</span>`);
         html += `${sep}✅ 选中: <b style="color:#5cb85c; font-size:15px;">${selectedUrls.size}</b> &nbsp;(${selParts.join('&nbsp;&nbsp;')})`;
     }
     
@@ -356,6 +370,18 @@ selectAllBtn.onclick = () => {
         });
     }
     updateUI();
+};
+
+// 清空列表
+const clearAllBtn = document.getElementById('clearAllBtn');
+clearAllBtn.onclick = () => {
+    allItems = [];
+    selectedUrls.clear();
+    list.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">已清空，点击刷新重新获取</div>';
+    // 重置下载按钮状态
+    downloadBtn.textContent = `⬇️ 下载选中 (0)`;
+    downloadBtn.style.backgroundColor = '#3c3c3c';
+    updateStats();
 };
 
 // 下载控制变量

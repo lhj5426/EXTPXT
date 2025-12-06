@@ -342,6 +342,7 @@
         <div class="row">
             <button id="refreshBtn">🔄 刷新</button>
             <button id="selectAllBtn">全选</button>
+            <button id="clearAllBtn" style="color: #d9534f;">清空</button>
 
             <!-- 自动刷新 -->
             <div class="checkbox-group" style="margin-left: 10px;">
@@ -393,12 +394,13 @@
             <span style="color: #666;">~</span>
             <input type="number" id="filterMaxH" class="size-input" value="400" placeholder="400" title="过滤高度最大值">
 
-            <div class="checkbox-group">
+            <div id="formatCheckboxes" class="checkbox-group">
                 <label><input type="checkbox" checked value="jpg"> JPG</label>
                 <label><input type="checkbox" checked value="png"> PNG</label>
                 <label><input type="checkbox" checked value="webp"> WEBP</label>
                 <label><input type="checkbox" checked value="avif"> AVIF</label>
                 <label><input type="checkbox" value="gif"> GIF</label>
+                <label><input type="checkbox" value="svg"> SVG</label>
             </div>
 
             <button id="showFailedBtn" style="display:none; background: #d9534f; border-color: #d9534f;">⚠️ 加载失败 (<span id="failedCount">0</span>)</button>
